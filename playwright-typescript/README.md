@@ -35,6 +35,43 @@ npm run test:demo
 
 API examples live in `tests/api.spec.ts`. They use `API_BASE_URL` if provided; otherwise they start a bundled local demo API server automatically.
 
+## Retry demo for artifacts
+
+This framework includes a dedicated retry example in `tests/demo-rerun.spec.ts`.
+
+How to find the test case:
+
+- file: `playwright-typescript/tests/demo-rerun.spec.ts`
+- suite: `Demo retry flow`
+- test: `fails once for artifacts and passes on rerun`
+
+The demo test is designed to fail on the first attempt and pass on the retry so the report contains the most useful failure artifacts:
+
+- failure screenshot from the first attempt
+- retained video for the failed attempt
+- trace captured on the first retry
+
+Run it with:
+
+```bash
+npm run test:demo
+```
+
+Or run the single test directly:
+
+```bash
+npx playwright test tests/demo-rerun.spec.ts --grep "fails once for artifacts and passes on rerun"
+```
+
+The behavior is driven by `playwright.config.ts`:
+
+- `retries: process.env.CI ? 1 : 0`
+- `trace: 'on-first-retry'`
+- `screenshot: 'only-on-failure'`
+- `video: 'retain-on-failure'`
+
+Inside the demo test, `testInfo.retry === 0` is used to force the first run to fail intentionally. That creates the screenshot and video artifacts before the rerun succeeds.
+
 ## How it is organized
 
 - `tests/`: Playwright specs for login, navigation, and form flows
@@ -70,6 +107,9 @@ After a run, Playwright produces:
 - HTML report
 - `test-results/junit-results.xml`
 - `allure-results/` for Allure
+- screenshots for failed attempts
+- video for failed attempts when retention rules keep it
+- trace data on the first retry
 
 To open the Allure report:
 

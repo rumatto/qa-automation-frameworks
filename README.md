@@ -45,7 +45,7 @@ Built to simulate a real-world QA automation setup used in production teams:
 
 | Framework | Stack | What it demonstrates | Docs | Latest report |
 | --- | --- | --- | --- | --- |
-| Playwright | TypeScript | modern web E2E + API testing | [playwright-typescript/README.md](playwright-typescript/README.md) | <https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/> |
+| Playwright | TypeScript | modern web E2E + API testing, retry artifacts | [playwright-typescript/README.md](playwright-typescript/README.md) | <https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/> |
 | Selenium | Python | Python-based browser automation | [selenium-python/README.md](selenium-python/README.md) | <https://rumatto.github.io/qa-automation-frameworks/selenium-python/> |
 | Selenium | Java | UI + API framework design, reporting, CI/CD | [selenium-java/README.md](selenium-java/README.md) | <https://rumatto.github.io/qa-automation-frameworks/selenium-java/> |
 
@@ -83,6 +83,13 @@ npx playwright install
 npx playwright test
 ```
 
+For the retry demo that fails once to generate screenshot, video, and retry trace artifacts:
+
+```bash
+cd playwright-typescript
+npm run test:demo
+```
+
 ## Recruiter Keywords
 
 - Selenium WebDriver
@@ -93,3 +100,9 @@ npx playwright test
 - Allure reporting
 - GitHub Actions CI/CD
 - Regression test automation
+
+## License
+
+This repository is proprietary and not open for unauthorized use.
+
+See [LICENSE](LICENSE) for the full terms.

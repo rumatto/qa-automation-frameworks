@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>QA Automation Frameworks</title>
+    <title>QA Automation Frameworks | Selenium | Playwright | API Testing | CI/CD</title>
+
+    <!-- FAVICON -->
+    <link rel="icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+
     <style>
         :root {
             color-scheme: dark;
@@ -26,36 +32,32 @@
             padding: 40px 24px;
         }
 
-        h1 {
-            color: var(--accent);
-            margin: 0 0 12px;
-        }
+        h1 { color: var(--accent); margin-bottom: 10px; }
+        h2 { color: var(--accent-soft); }
 
-        p {
-            margin: 0;
-        }
+        .container { max-width: 1040px; margin: auto; }
 
         .hero {
-            margin-bottom: 32px;
             text-align: center;
+            margin-bottom: 32px;
         }
 
         .hero p {
             color: var(--muted);
-            max-width: 720px;
-            margin: 0 auto;
+            max-width: 760px;
+            margin: auto;
             line-height: 1.6;
         }
 
-        .container {
-            max-width: 960px;
-            margin: auto;
+        .hero-links {
+            margin-top: 16px;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
+            align-items: stretch;
         }
 
         .card {
@@ -63,26 +65,15 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+
         }
 
         .card:hover {
             background: var(--panel-hover);
-            border-color: #3d444d;
             transform: translateY(-2px);
-        }
-
-        .card h2 {
-            margin-top: 0;
-            margin-bottom: 12px;
-            color: var(--accent-soft);
-        }
-
-        .card p {
-            color: var(--muted);
-            line-height: 1.6;
-            min-height: 72px;
         }
 
         .links a {
@@ -93,11 +84,55 @@
             border-radius: 6px;
             color: var(--text);
             text-decoration: none;
-            transition: background 0.2s ease;
         }
 
         .links a:hover {
             background: var(--button-hover);
+        }
+
+        ul {
+            color: var(--muted);
+            line-height: 1.6;
+            padding-left: 18px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .stat {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 24px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .eyebrow {
+            color: var(--muted);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .muted {
+            color: var(--muted);
+            line-height: 1.6;
         }
 
         footer {
@@ -106,87 +141,178 @@
             font-size: 12px;
             color: var(--muted);
         }
-
-        .meta {
-            margin-top: 14px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 24px 16px;
-            }
-
-            .card p {
-                min-height: 0;
-            }
-        }
     </style>
 </head>
+
 <body>
 
 <div class="container">
 
+    <!-- HERO -->
     <div class="hero">
+        <div class="eyebrow">Automation Framework Portfolio</div>
         <h1>QA Automation Frameworks</h1>
         <p>
-            Independent QA automation example projects collected in one monorepo.
-            Open each project report directly from here, or jump to the project README for setup and local usage details.
+            Production-style QA automation examples across Playwright, Selenium, Java,
+            Python, and TypeScript. The repo focuses on maintainable test design, API
+            coverage, CI execution, and failure artifacts that make debugging easier.
+        </p>
+
+        <div class="links hero-links">
+            <a href="https://github.com/rumatto/qa-automation-frameworks" target="_blank">GitHub Repo</a>
+            <a href="https://github.com/rumatto/qa-automation-frameworks/actions" target="_blank">CI/CD Pipeline</a>
+            <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/README.md" target="_blank">Monorepo README</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <strong>3</strong>
+                <span>framework examples</span>
+            </div>
+            <div class="stat">
+                <strong>UI + API</strong>
+                <span>coverage patterns</span>
+            </div>
+            <div class="stat">
+                <strong>CI/CD</strong>
+                <span>published reports</span>
+            </div>
+            <div class="stat">
+                <strong>Artifacts</strong>
+                <span>screenshots, video, trace</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="card" style="margin-bottom: 24px;">
+        <h2>Tech Stack</h2>
+        <p class="muted">
+            Selenium • Playwright • RestAssured • JUnit 5 • Pytest • TypeScript • Java • Python • GitHub Actions • Allure
         </p>
     </div>
 
-    <div class="grid">
+    <!-- WHAT THIS SHOWS -->
+    <div class="card">
+        <h2>What This Project Demonstrates</h2>
+        <ul>
+            <li>UI automation across Selenium and Playwright</li>
+            <li>API coverage with RestAssured and Playwright request contexts</li>
+            <li>Page Object Model and reusable fixtures</li>
+            <li>CI execution with published reports</li>
+            <li>Failure diagnostics with screenshots, video, and trace artifacts</li>
+            <li>Environment-aware local and CI test execution</li>
+        </ul>
+    </div>
+
+    <!-- KEY OUTCOMES -->
+    <div class="card" style="margin-top: 24px;">
+        <h2>Key Outcomes</h2>
+        <ul>
+            <li>Automated UI and API checks across three independent stacks</li>
+            <li>Published browsable reports from GitHub Pages</li>
+            <li>Included a retry demo that fails once to generate video and screenshot artifacts</li>
+            <li>Kept framework structure readable for portfolio and interview review</li>
+        </ul>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="grid" style="margin-top: 24px;">
+
         <div class="card">
             <h2>Playwright (TypeScript)</h2>
             <p>
-                Playwright Test framework with page objects, shared fixtures, and HTML, JUnit, and Allure reporting.
+                Modern Playwright framework with Page Object Model, reusable fixtures,
+                API coverage, and integrated reporting. Includes a retry demo that
+                fails on the first attempt to produce screenshot, video, and retry trace artifacts.
             </p>
-            <div class="meta">Path: <code>playwright-typescript</code></div>
             <div class="links">
-                <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/playwright-typescript/README.md">Project README</a>
-                <a href="https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/">Open Report</a>
+                <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/playwright-typescript/README.md" target="_blank">README</a>
+                <a href="https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/" target="_blank">Report</a>
             </div>
         </div>
 
         <div class="card">
             <h2>Selenium (Python)</h2>
             <p>
-                Pytest-based Selenium framework with page objects, shared fixtures, failure screenshots, and a bundled demo app.
+                Pytest-based Selenium framework with reusable fixtures,
+                failure screenshots, and a local demo app fallback for stable local execution.
             </p>
-            <div class="meta">Path: <code>selenium-python</code></div>
             <div class="links">
-                <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/selenium-python/README.md">Project README</a>
-                <a href="https://rumatto.github.io/qa-automation-frameworks/selenium-python/">Open Report</a>
+                <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/selenium-python/README.md" target="_blank">README</a>
+                <a href="https://rumatto.github.io/qa-automation-frameworks/selenium-python/" target="_blank">Report</a>
             </div>
         </div>
 
         <div class="card">
-            <h2>Selenium (Java)</h2>
+            <h2>Selenium (Java + API)</h2>
             <p>
-                JUnit 5 Java framework with Selenium UI examples, RestAssured API examples, and bundled local demo app and API fixtures.
+                Java framework combining Selenium UI tests and RestAssured API tests
+                with JUnit 5, Allure reporting, and clear suite separation for UI and API execution.
             </p>
-            <div class="meta">Path: <code>selenium-java</code></div>
             <div class="links">
-                <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/selenium-java/README.md">Project README</a>
-                <a href="https://rumatto.github.io/qa-automation-frameworks/selenium-java/">Open Report</a>
+                <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/selenium-java/README.md" target="_blank">README</a>
+                <a href="https://rumatto.github.io/qa-automation-frameworks/selenium-java/" target="_blank">Report</a>
             </div>
         </div>
 
-        <div class="card">
-            <h2>GitHub Actions</h2>
-            <p>
-                Workflow runs that build and publish the project reports.
-            </p>
-            <div class="meta">Source: repository automation</div>
-            <div class="links">
-                <a href="https://github.com/rumatto/qa-automation-frameworks/actions">View Workflows</a>
-            </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="card" style="margin-top: 24px;">
+        <h2>How It Works</h2>
+        <p class="muted">
+            Each framework is isolated in its own folder and can run independently.
+            UI automation uses Selenium or Playwright, API coverage uses RestAssured or
+            Playwright request contexts, and GitHub Actions publishes the latest generated reports.
+        </p>
+    </div>
+
+    <!-- RETRY FLOW -->
+    <div class="card" style="margin-top: 24px;">
+        <h2>Retry and Artifact Flow</h2>
+        <p class="muted">
+            The Playwright example includes a dedicated rerun test that intentionally fails once
+            and passes on retry. This makes the report show the exact artifacts engineers usually
+            need during triage: failure screenshot, retained video, and first-retry trace.
+        </p>
+        <p class="muted">
+            To find it in the published Allure report, open the Playwright report and go to
+            <code>Suites</code>. Then open <code>demo-rerun.spec.ts</code>, select the
+            <code>Demo retry flow</code> suite, and open
+            <code>fails once for artifacts and passes on rerun</code>.
+        </p>
+        <p class="muted">
+            Inside that test result, review the attachments from the failed first attempt to see
+            the screenshot, retained video, and retry trace.
+        </p>
+        <div class="links">
+            <a href="https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/" target="_blank">Open Playwright Report</a>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="card" style="margin-top: 24px;">
+        <h2>Documentation Notes</h2>
+        <p class="muted">
+            The most complete implementation walkthrough lives in the Selenium Java README.
+            The Playwright README documents retry behavior and artifact retention, while the
+            Python example stays intentionally small and focused on fixture-driven Selenium basics.
+        </p>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="card" style="margin-top: 24px;">
+        <h2>Contact</h2>
+        <div class="links">
+            <a href="https://github.com/rumatto" target="_blank">GitHub</a>
+            <a href="https://linkedin.com/in/roman-s-930a79a4" target="_blank">LinkedIn</a>
+            <a href="mailto:rumatto@gmail.com">Email</a>
         </div>
     </div>
 
     <footer>
-        QA Automation Frameworks • GitHub Pages
+        QA Automation Portfolio • Built with GitHub Pages
     </footer>
 
 </div>
