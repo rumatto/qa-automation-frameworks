@@ -1,0 +1,6 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","686","validLogin()","","Mon Apr 27 23:34:28 UTC 2026","passed","Mon Apr 27 23:34:29 UTC 2026","","frameworks.seleniumjava.tests.LoginTest","frameworks.seleniumjava.tests.LoginTest","validLogin"
+"","978","submitFormSuccessfully()","","Mon Apr 27 23:34:26 UTC 2026","passed","Mon Apr 27 23:34:27 UTC 2026","","frameworks.seleniumjava.tests.FormTest","frameworks.seleniumjava.tests.FormTest","submitFormSuccessfully"
+"","674","invalidLoginShowsError()","","Mon Apr 27 23:34:27 UTC 2026","passed","Mon Apr 27 23:34:28 UTC 2026","","frameworks.seleniumjava.tests.LoginTest","frameworks.seleniumjava.tests.LoginTest","invalidLoginShowsError"
+"","816","navigateBetweenSections()","","Mon Apr 27 23:34:29 UTC 2026","passed","Mon Apr 27 23:34:29 UTC 2026","","frameworks.seleniumjava.tests.NavigationTest","frameworks.seleniumjava.tests.NavigationTest","navigateBetweenSections"
+"","10603","invalidFormShowsValidationError()","","Mon Apr 27 23:34:15 UTC 2026","passed","Mon Apr 27 23:34:26 UTC 2026","","frameworks.seleniumjava.tests.FormTest","frameworks.seleniumjava.tests.FormTest","invalidFormShowsValidationError"
