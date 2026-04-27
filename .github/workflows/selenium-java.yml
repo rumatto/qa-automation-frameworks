@@ -1,0 +1,67 @@
+name: Selenium (Java)
+on:
+  push:
+    paths:
+      - "selenium-java/**"
+  pull_request:
+    paths:
+      - "selenium-java/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: selenium-java-pages
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: selenium-java
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Gradle tests
+        run: ./gradlew test --no-daemon
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Generate Allure report
+        if: always()
+        uses: simple-elf/allure-report-action@v1.13
+        with:
+          allure_results: selenium-java/build/allure-results
+          allure_report: selenium-java/allure-report
+          gh_pages: gh-pages
+          allure_history: selenium-java/allure-history
+          subfolder: selenium-java
+
+      - name: Deploy Allure report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: selenium-java/allure-history/selenium-java
+          destination_dir: selenium-java

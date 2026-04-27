@@ -1,0 +1,10 @@
+target/
+.gradle/
+build/
+allure-results/
+allure-report/
+.idea/
+.classpath
+.project
+.settings/
+.DS_Store

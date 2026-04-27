@@ -1,0 +1,75 @@
+name: Playwright (TypeScript)
+
+on:
+  push:
+    paths:
+      - "playwright-typescript/**"
+  pull_request:
+    paths:
+      - "playwright-typescript/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: playwright-typescript-pages
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: playwright-typescript
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run tests
+        run: npx playwright test
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Generate Allure report
+        if: always()
+        uses: simple-elf/allure-report-action@v1.13
+        with:
+          allure_results: playwright-typescript/allure-results
+          allure_report: playwright-typescript/allure-report
+          gh_pages: gh-pages
+          allure_history: playwright-typescript/allure-history
+          subfolder: playwright-typescript
+
+      - name: Generate index page
+        run: bash ../.github/scripts/generate-index.sh gh-pages
+
+      - name: Deploy Allure report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: playwright-typescript/allure-history/playwright-typescript
+          destination_dir: playwright-typescript
+
+

@@ -1,0 +1,74 @@
+plugins {
+  id 'java'
+  id 'io.qameta.allure' version '2.11.2'
+}
+
+group = 'frameworks'
+version = '1.0.0'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  junitVersion = '5.10.2'
+  junitPlatformVersion = '1.10.2'
+  seleniumVersion = '4.21.0'
+  restAssuredVersion = '5.5.1'
+}
+
+dependencies {
+  testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+  testImplementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+  testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+  testImplementation "io.rest-assured:json-schema-validator:${restAssuredVersion}"
+  testImplementation 'io.qameta.allure:allure-junit5:2.25.0'
+  testImplementation 'io.qameta.allure:allure-rest-assured:2.25.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+allure {
+    version = '2.25.0'
+    autoconfigure = true
+    aspectjweaver = true
+}
+
+tasks.withType(Test).configureEach {
+  useJUnitPlatform()
+
+  testLogging {
+    events 'passed', 'skipped', 'failed'
+    exceptionFormat = 'full'
+  }
+
+  reports {
+    junitXml.required = true
+    html.required = true
+  }
+}
+
+tasks.register('uiTest', Test) {
+  description = 'Runs Selenium UI tests only.'
+  group = 'verification'
+  useJUnitPlatform {
+    includeTags 'ui'
+  }
+}
+
+tasks.register('apiTest', Test) {
+  description = 'Runs RestAssured API tests only.'
+  group = 'verification'
+  useJUnitPlatform {
+    includeTags 'api'
+  }
+}
