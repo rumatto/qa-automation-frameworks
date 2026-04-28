@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>QA Automation Frameworks | Selenium | Playwright | API Testing | CI/CD</title>
+    <title>QA Automation Frameworks | Selenium | Playwright | Docker | API Testing | CI/CD</title>
 
     <!-- FAVICON -->
     <link rel="icon" href="favicon.ico">
@@ -56,7 +56,7 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            gap: 16px;
             align-items: stretch;
         }
 
@@ -64,7 +64,7 @@
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 20px;
+            padding: 16px;
             transition: 0.2s;
             display: flex;
             flex-direction: column;
@@ -88,6 +88,11 @@
 
         .links a:hover {
             background: var(--button-hover);
+        }
+
+        .grid .card .links {
+            margin-top: auto;
+            padding-top: 12px;
         }
 
         ul {
@@ -155,7 +160,8 @@
         <p>
             Production-style QA automation examples across Playwright, Selenium, Java,
             Python, and TypeScript. The repo focuses on maintainable test design, API
-            coverage, CI execution, and failure artifacts that make debugging easier.
+            coverage, Dockerized execution, shared demo services, and failure artifacts
+            that make debugging easier.
         </p>
 
         <div class="links hero-links">
@@ -174,8 +180,8 @@
                 <span>coverage patterns</span>
             </div>
             <div class="stat">
-                <strong>CI/CD</strong>
-                <span>published reports</span>
+                <strong>Docker + CI</strong>
+                <span>same execution path</span>
             </div>
             <div class="stat">
                 <strong>Artifacts</strong>
@@ -188,7 +194,7 @@
     <div class="card" style="margin-bottom: 24px;">
         <h2>Tech Stack</h2>
         <p class="muted">
-            Selenium • Playwright • RestAssured • JUnit 5 • Pytest • TypeScript • Java • Python • GitHub Actions • Allure
+            Selenium • Playwright • RestAssured • JUnit 5 • Pytest • TypeScript • Java • Python • Docker Compose • Nginx • Node.js • GitHub Actions • Allure
         </p>
     </div>
 
@@ -199,9 +205,10 @@
             <li>UI automation across Selenium and Playwright</li>
             <li>API coverage with RestAssured and Playwright request contexts</li>
             <li>Page Object Model and reusable fixtures</li>
-            <li>CI execution with published reports</li>
+            <li>Shared demo app and API reused across local, Docker, and CI runs</li>
+            <li>CI execution through Docker with published reports</li>
             <li>Failure diagnostics with screenshots, video, and trace artifacts</li>
-            <li>Environment-aware local and CI test execution</li>
+            <li>Environment-aware local, Docker, and CI test execution</li>
         </ul>
     </div>
 
@@ -210,6 +217,8 @@
         <h2>Key Outcomes</h2>
         <ul>
             <li>Automated UI and API checks across three independent stacks</li>
+            <li>Standardized one-command execution with <code>docker compose</code></li>
+            <li>Shared <code>test-app</code> and <code>test-api</code> services used by containerized runs</li>
             <li>Published browsable reports from GitHub Pages</li>
             <li>Included a retry demo that fails once to generate video and screenshot artifacts</li>
             <li>Kept framework structure readable for portfolio and interview review</li>
@@ -223,8 +232,9 @@
             <h2>Playwright (TypeScript)</h2>
             <p>
                 Modern Playwright framework with Page Object Model, reusable fixtures,
-                API coverage, and integrated reporting. Includes a retry demo that
-                fails on the first attempt to produce screenshot, video, and retry trace artifacts.
+                API coverage, integrated reporting, and Dockerized execution against
+                shared demo services. Includes a retry demo that fails on the first
+                attempt to produce screenshot, video, and retry trace artifacts.
             </p>
             <div class="links">
                 <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/playwright-typescript/README.md" target="_blank">README</a>
@@ -236,7 +246,8 @@
             <h2>Selenium (Python)</h2>
             <p>
                 Pytest-based Selenium framework with reusable fixtures,
-                failure screenshots, and a local demo app fallback for stable local execution.
+                failure screenshots, and a shared demo app fallback that matches the
+                Dockerized execution model.
             </p>
             <div class="links">
                 <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/selenium-python/README.md" target="_blank">README</a>
@@ -248,7 +259,8 @@
             <h2>Selenium (Java + API)</h2>
             <p>
                 Java framework combining Selenium UI tests and RestAssured API tests
-                with JUnit 5, Allure reporting, and clear suite separation for UI and API execution.
+                with JUnit 5, Allure reporting, clear suite separation for UI and API
+                execution, and shared local or Docker-backed demo services.
             </p>
             <div class="links">
                 <a href="https://github.com/rumatto/qa-automation-frameworks/blob/master/selenium-java/README.md" target="_blank">README</a>
@@ -265,6 +277,12 @@
             Each framework is isolated in its own folder and can run independently.
             UI automation uses Selenium or Playwright, API coverage uses RestAssured or
             Playwright request contexts, and GitHub Actions publishes the latest generated reports.
+        </p>
+        <p class="muted">
+            Docker is used to provision a consistent execution environment across local
+            runs and CI. The shared demo UI is served over HTTP with Nginx, the demo API
+            is provided as a lightweight Node.js service, and the framework containers run
+            against the same environment shape that is used in GitHub Actions.
         </p>
     </div>
 
@@ -298,6 +316,7 @@
             The most complete implementation walkthrough lives in the Selenium Java README.
             The Playwright README documents retry behavior and artifact retention, while the
             Python example stays intentionally small and focused on fixture-driven Selenium basics.
+            The root README documents the shared Docker architecture and one-command execution path.
         </p>
     </div>
 
