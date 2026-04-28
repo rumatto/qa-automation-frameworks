@@ -23,7 +23,8 @@ services:
 
   playwright:
     build:
-      context: ./playwright-typescript
+      context: .
+      dockerfile: playwright-typescript/Dockerfile
     depends_on:
       test-app:
         condition: service_healthy
@@ -34,9 +35,9 @@ services:
       API_BASE_URL: http://test-api:8080
     shm_size: 2gb
     volumes:
-      - ./artifacts/playwright/test-results:/app/test-results
-      - ./artifacts/playwright/playwright-report:/app/playwright-report
-      - ./artifacts/playwright/allure-results:/app/allure-results
+      - ./artifacts/playwright/test-results:/workspace/playwright-typescript/test-results
+      - ./artifacts/playwright/playwright-report:/workspace/playwright-typescript/playwright-report
+      - ./artifacts/playwright/allure-results:/workspace/playwright-typescript/allure-results
 
   selenium-python:
     build:
@@ -53,7 +54,8 @@ services:
 
   selenium-java:
     build:
-      context: ./selenium-java
+      context: .
+      dockerfile: selenium-java/Dockerfile
     depends_on:
       test-app:
         condition: service_healthy
@@ -64,6 +66,6 @@ services:
       API_BASE_URL: http://test-api:8080
     shm_size: 2gb
     volumes:
-      - ./artifacts/selenium-java/test-results:/app/build/test-results
-      - ./artifacts/selenium-java/allure-results:/app/build/allure-results
-      - ./artifacts/selenium-java/allure-report:/app/build/reports/allure-report
+      - ./artifacts/selenium-java/test-results:/workspace/selenium-java/build/test-results
+      - ./artifacts/selenium-java/allure-results:/workspace/selenium-java/build/allure-results
+      - ./artifacts/selenium-java/allure-report:/workspace/selenium-java/build/reports/allure-report

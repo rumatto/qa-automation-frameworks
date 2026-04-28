@@ -10,12 +10,13 @@ RUN apt-get update \
       openjdk-17-jdk \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /workspace/selenium-java
 
-COPY gradlew build.gradle settings.gradle ./
-COPY gradle ./gradle
+COPY selenium-java/gradlew selenium-java/build.gradle selenium-java/settings.gradle ./
+COPY selenium-java/gradle ./gradle
 RUN ./gradlew --version --no-daemon
 
-COPY src ./src
+COPY selenium-java/src ./src
+COPY demo-services/test-api/contracts ../demo-services/test-api/contracts
 
 CMD ["./gradlew", "test", "allureReport", "--no-daemon"]
