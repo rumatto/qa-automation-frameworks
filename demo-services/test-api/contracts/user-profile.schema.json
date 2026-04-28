@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rumatto.github.io/qa-automation-frameworks/contracts/user-profile.schema.json",
+  "title": "Demo user profile response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["user"],
+  "properties": {
+    "user": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "username", "role", "features"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "enum": [101]
+        },
+        "username": {
+          "type": "string",
+          "enum": ["demo"]
+        },
+        "role": {
+          "type": "string",
+          "enum": ["qa-engineer"]
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

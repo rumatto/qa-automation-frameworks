@@ -1,0 +1,17 @@
+.git/
+.idea/
+artifacts/
+docs/assets/
+playwright-typescript/node_modules/
+playwright-typescript/playwright-report/
+playwright-typescript/test-results/
+playwright-typescript/allure-results/
+playwright-typescript/allure-report/
+selenium-java/.gradle/
+selenium-java/build/
+selenium-python/.venv/
+selenium-python/__pycache__/
+selenium-python/.pytest_cache/
+selenium-python/test-results/
+selenium-python/allure-results/
+**/.DS_Store
