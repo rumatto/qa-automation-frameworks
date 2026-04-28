@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 
 @Tag("api")
@@ -27,6 +28,7 @@ public final class MessageApiTest extends BaseApiTest {
         .post("/api/messages")
     .then()
         .statusCode(201)
+        .body(matchesJsonSchemaInClasspath("message-accepted.schema.json"))
         .body("status", equalTo("accepted"))
         .body("messageId", equalTo("msg-001"))
         .body("echo.email", equalTo("qa@example.com"))
@@ -47,6 +49,7 @@ public final class MessageApiTest extends BaseApiTest {
         .post("/api/messages")
     .then()
         .statusCode(400)
+        .body(matchesJsonSchemaInClasspath("error-response.schema.json"))
         .body("status", equalTo("error"))
         .body("message", equalTo("A valid email is required."));
   }

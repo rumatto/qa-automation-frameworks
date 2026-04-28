@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 
@@ -21,6 +22,7 @@ public final class UserApiTest extends BaseApiTest {
         .get("/api/users/demo")
     .then()
         .statusCode(200)
+        .body(matchesJsonSchemaInClasspath("user-profile.schema.json"))
         .body("user.id", equalTo(101))
         .body("user.username", equalTo("demo"))
         .body("user.role", equalTo("qa-engineer"))

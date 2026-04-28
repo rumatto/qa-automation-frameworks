@@ -1,5 +1,6 @@
 import { apiTest as test, expect } from '../utils/fixtures';
 import { allure } from 'allure-playwright';
+import { expectSchemaMatch } from '../utils/contracts';
 
 test.describe('API automation', () => {
   test('fetch demo user profile', async ({ apiRequest }) => {
@@ -10,6 +11,7 @@ test.describe('API automation', () => {
     expect(response.status()).toBe(200);
 
     const body = await response.json();
+    expectSchemaMatch('user-profile.schema.json', body);
     expect(body.user).toMatchObject({
       id: 101,
       username: 'demo',
@@ -32,6 +34,7 @@ test.describe('API automation', () => {
     expect(response.status()).toBe(201);
 
     const body = await response.json();
+    expectSchemaMatch('message-accepted.schema.json', body);
     expect(body).toMatchObject({
       status: 'accepted',
       messageId: 'msg-001',
@@ -56,6 +59,7 @@ test.describe('API automation', () => {
     expect(response.status()).toBe(400);
 
     const body = await response.json();
+    expectSchemaMatch('error-response.schema.json', body);
     expect(body).toEqual({
       status: 'error',
       message: 'A valid email is required.'

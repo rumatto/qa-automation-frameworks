@@ -35,6 +35,14 @@ dependencies {
   testImplementation 'io.qameta.allure:allure-rest-assured:2.25.0'
 }
 
+sourceSets {
+  test {
+    resources {
+      srcDir '../demo-services/test-api/contracts'
+    }
+  }
+}
+
 test {
     useJUnitPlatform()
 }

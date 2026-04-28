@@ -26,6 +26,7 @@ The project is designed to show how UI and API automation can live in one mainta
 - Page Object Model implementation
 - Config-driven test execution with `BASE_URL` and `API_BASE_URL`
 - Separate UI and API suites using JUnit tags and Gradle tasks
+- Shared JSON schema validation for API responses
 - Allure reporting with screenshot capture on UI failures
 - Shared demo app and shared local API server so the framework can run without external dependencies
 - GitHub Actions pipeline that publishes live reports to GitHub Pages
@@ -94,6 +95,19 @@ demo-services/
 - `tests/api/` contains API scenarios separated from browser concerns
 - `utils/` contains environment helpers and local demo infrastructure launchers
 - `build.gradle` defines dependencies, JUnit tags, Allure, and reporting tasks
+- `../demo-services/test-api/contracts/` contains shared API response schemas used by both Java and Playwright consumers
+
+### Shared schema validation
+
+The Java API tests validate demo API responses against the shared JSON schemas in `../demo-services/test-api/contracts/`.
+
+Current contract coverage:
+
+- `user-profile.schema.json` for `GET /api/users/demo`
+- `message-accepted.schema.json` for successful `POST /api/messages`
+- `error-response.schema.json` for invalid `POST /api/messages`
+
+RestAssured applies those checks with `matchesJsonSchemaInClasspath(...)`, while `build.gradle` exposes the shared contract directory as test resources.
 
 ## Demo and Reports
 

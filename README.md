@@ -9,6 +9,7 @@ Modern QA teams rarely work in one tool only. This repository shows how the same
 - Selenium WebDriver for browser-based regression coverage
 - Java, Python, and TypeScript implementation styles
 - UI and API automation patterns
+- Shared schema validation for API contract checks
 - Reporting and CI publishing workflows
 
 If you are reviewing this as a hiring manager or recruiter, the strongest end-to-end example is the Java framework:
@@ -45,9 +46,9 @@ Built to simulate a real-world QA automation setup used in production teams:
 
 | Framework | Stack | What it demonstrates | Docs | Latest report |
 | --- | --- | --- | --- | --- |
-| Playwright | TypeScript | modern web E2E + API testing, retry artifacts | [playwright-typescript/README.md](playwright-typescript/README.md) | <https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/> |
+| Playwright | TypeScript | modern web E2E + API testing, shared schema validation, retry artifacts | [playwright-typescript/README.md](playwright-typescript/README.md) | <https://rumatto.github.io/qa-automation-frameworks/playwright-typescript/> |
 | Selenium | Python | Python-based browser automation | [selenium-python/README.md](selenium-python/README.md) | <https://rumatto.github.io/qa-automation-frameworks/selenium-python/> |
-| Selenium | Java | UI + API framework design, reporting, CI/CD | [selenium-java/README.md](selenium-java/README.md) | <https://rumatto.github.io/qa-automation-frameworks/selenium-java/> |
+| Selenium | Java | UI + API framework design, shared schema validation, reporting, CI/CD | [selenium-java/README.md](selenium-java/README.md) | <https://rumatto.github.io/qa-automation-frameworks/selenium-java/> |
 
 Main report index: <https://rumatto.github.io/qa-automation-frameworks/>
 
@@ -182,6 +183,17 @@ Rebuild from scratch when you need fresh containers:
 ```bash
 docker compose up --build --force-recreate
 ```
+
+## Shared Contract Validation
+
+The demo API response contracts are defined once under `demo-services/test-api/contracts/`.
+
+They are currently validated by:
+
+- `playwright-typescript/tests/api.spec.ts` using `ajv`
+- `selenium-java` API tests using RestAssured JSON schema validation
+
+This keeps the contract checks close to the consumer tests while preventing schema drift between frameworks.
 
 ## Recruiter Keywords
 

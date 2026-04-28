@@ -6,6 +6,7 @@ Small Playwright + TypeScript example framework with:
 - Page objects in `pages/`
 - Shared fixtures in `utils/fixtures.ts`
 - API tests using Playwright request contexts
+- Shared JSON schema validation for API responses
 - HTML, JUnit, and Allure reporting
 - Screenshots, trace, and video for failed or retried runs
 
@@ -47,6 +48,19 @@ npm run test:demo
 `npm test` runs with `TEST_ENV=testing` by default.
 
 API examples live in `tests/api.spec.ts`. They use `API_BASE_URL` if provided; otherwise they start the shared local demo API from `demo-services/test-api/server.js`.
+Shared response contracts live under `../demo-services/test-api/contracts/` and are validated in the Playwright API tests.
+
+### Shared schema validation
+
+Playwright API tests validate response bodies against the shared JSON schemas in `../demo-services/test-api/contracts/`.
+
+Current contract coverage:
+
+- `user-profile.schema.json` for `GET /api/users/demo`
+- `message-accepted.schema.json` for successful `POST /api/messages`
+- `error-response.schema.json` for invalid `POST /api/messages`
+
+The validator helper lives in `utils/contracts.ts` and uses `ajv` so the same contract files can be checked locally, in Docker, and in CI.
 
 ## Added framework examples
 
@@ -60,6 +74,20 @@ What it shows:
 - save browser storage state to `playwright/.auth/user.json`
 - open a fresh browser context
 - reuse the saved state without logging in again
+
+How it works:
+
+- the suite runs in `serial` mode so the saved auth file is created before the reuse check runs
+- if `resolvedAppUrl` points to a `file:` URL, the test starts `utils/testAppServer.ts` first and serves the shared demo app over localhost
+- `beforeAll` removes any stale `playwright/.auth/user.json` file before the flow starts
+- the first test logs in with credentials from `utils/runtimeConfig.ts`, verifies the authenticated UI, and writes storage state to `playwright/.auth/user.json`
+- the second test creates a brand-new browser context with `storageState: authStatePath` and verifies that the app opens in an already authenticated state
+- `afterAll` removes the saved auth file and stops the temporary local app server if one was started
+
+Why the local app server is needed:
+
+- Playwright can save storage state from a `file:` URL, but reusing that state is more predictable when the app is served over HTTP
+- the fallback server keeps local non-Docker runs self-contained while still matching the app behavior used in Docker and CI
 
 Run it with:
 
