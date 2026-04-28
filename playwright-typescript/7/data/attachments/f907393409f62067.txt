@@ -1,0 +1,81 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: demo-rerun.spec.ts >> Demo retry flow >> fails once for artifacts and passes on rerun
+- Location: tests/demo-rerun.spec.ts:8:7
+
+# Error details
+
+```
+Error: Intentional failure on the first attempt to generate screenshot, video, and retry trace artifacts.
+
+expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received:   0
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - heading "Playwright Demo App" [level=1] [ref=e3]
+  - generic [ref=e4]:
+    - navigation "Primary" [ref=e5]:
+      - link "Home" [ref=e6] [cursor=pointer]:
+        - /url: "#home"
+      - link "Settings" [ref=e7] [cursor=pointer]:
+        - /url: "#settings"
+      - link "Form" [ref=e8] [cursor=pointer]:
+        - /url: "#form"
+      - button "Logout" [ref=e9]
+    - separator [ref=e10]
+    - generic [ref=e11]:
+      - heading "Home" [level=2] [ref=e12]
+      - paragraph [ref=e13]: Welcome, demo.
+```
+
+# Test source
+
+```ts
+  1  | import { allure } from 'allure-playwright';
+  2  | import { expect, test } from '../utils/fixtures';
+  3  | import { runtimeConfig } from '../utils/runtimeConfig';
+  4  | 
+  5  | test.describe('Demo retry flow', () => {
+  6  |   test.describe.configure({ retries: 1 });
+  7  | 
+  8  |   test('fails once for artifacts and passes on rerun', async ({ loginPage, homePage }, testInfo) => {
+  9  |     await allure.story('Intentional retry demo');
+  10 | 
+  11 |     console.log(`Demo retry attempt ${testInfo.retry + 1} started`);
+  12 | 
+  13 |     await loginPage.login(runtimeConfig.credentials.username, runtimeConfig.credentials.password);
+  14 | 
+  15 |     const title = await homePage.getTitle();
+  16 |     expect(title).toContain('Welcome');
+  17 | 
+  18 |     if (testInfo.retry === 0) {
+  19 |       const note = 'Intentional failure on the first attempt to generate screenshot, video, and retry trace artifacts.';
+  20 |       console.log(note);
+  21 |       await testInfo.attach('demo-rerun-note', {
+  22 |         body: note,
+  23 |         contentType: 'text/plain'
+  24 |       });
+  25 | 
+> 26 |       expect(testInfo.retry, note).toBeGreaterThan(0);
+     |                                    ^ Error: Intentional failure on the first attempt to generate screenshot, video, and retry trace artifacts.
+  27 |     }
+  28 | 
+  29 |     const whoAmI = await homePage.getTextWhoAmI();
+  30 |     expect(whoAmI).toContain(runtimeConfig.credentials.username);
+  31 |     console.log(`Demo retry attempt ${testInfo.retry + 1} passed`);
+  32 |   });
+  33 | });
+  34 | 
+```

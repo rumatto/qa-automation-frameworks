@@ -1,0 +1,57 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: api.spec.ts >> API automation >> fetch demo user profile
+- Location: tests/api.spec.ts:6:7
+
+# Error details
+
+```
+Error: ENOENT: no such file or directory, open '/demo-services/test-api/contracts/user-profile.schema.json'
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - heading "Playwright Demo App" [level=1] [ref=e3]
+  - generic [ref=e4]:
+    - heading "Login" [level=2] [ref=e5]
+    - generic [ref=e6]:
+      - text: Username
+      - textbox "Username" [ref=e7]
+    - generic [ref=e8]:
+      - text: Password
+      - textbox "Password" [ref=e9]
+    - button "Sign in" [ref=e10]
+```
+
+# Test source
+
+```ts
+  1  | import Ajv from 'ajv';
+  2  | import fs from 'node:fs';
+  3  | import path from 'node:path';
+  4  | 
+  5  | const ajv = new Ajv({ allErrors: true, strict: true });
+  6  | 
+  7  | export function expectSchemaMatch(fileName: string, payload: unknown): void {
+  8  |   const schemaPath = path.resolve(__dirname, '../../demo-services/test-api/contracts', fileName);
+> 9  |   const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8')) as object;
+     |                                ^ Error: ENOENT: no such file or directory, open '/demo-services/test-api/contracts/user-profile.schema.json'
+  10 |   const validate = ajv.compile(schema);
+  11 | 
+  12 |   if (validate(payload)) {
+  13 |     return;
+  14 |   }
+  15 | 
+  16 |   const details = ajv.errorsText(validate.errors, { separator: '\n' });
+  17 |   throw new Error(`Schema validation failed for ${fileName}:\n${details}`);
+  18 | }
+  19 | 
+```
