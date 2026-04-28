@@ -18,8 +18,18 @@ Small Playwright + TypeScript example framework with:
 
 ```bash
 npm install
-npx playwright install
+npx playwright install chromium
 ```
+
+Playwright manages its own browser binaries for this framework; there is no ChromeDriver setup here.
+
+## Docker
+
+```bash
+docker compose up --build playwright
+```
+
+In Compose, this suite points to the shared `test-app` and `test-api` services instead of using its local fallback servers. Those services are also published on the host at `http://localhost:3000/app.html` and `http://localhost:8080`. To inspect them directly, start `docker compose up --build test-app test-api`. Reports are exported under `artifacts/playwright/` from the repo root.
 
 ## Common commands
 
@@ -28,12 +38,59 @@ npm test
 npm run test:headed
 npm run test:ui
 npm run test:dev
+npm run test:staging
+npm run test:production
+npm run test:auth-state
 npm run test:demo
 ```
 
 `npm test` runs with `TEST_ENV=testing` by default.
 
-API examples live in `tests/api.spec.ts`. They use `API_BASE_URL` if provided; otherwise they start a bundled local demo API server automatically.
+API examples live in `tests/api.spec.ts`. They use `API_BASE_URL` if provided; otherwise they start the shared local demo API from `demo-services/test-api/server.js`.
+
+## Added framework examples
+
+### Authentication state
+
+This framework now includes a dedicated storage-state example in `tests/auth-state.spec.ts`.
+
+What it shows:
+
+- log in once
+- save browser storage state to `playwright/.auth/user.json`
+- open a fresh browser context
+- reuse the saved state without logging in again
+
+Run it with:
+
+```bash
+npm run test:auth-state
+```
+
+Note: the shared demo app now persists login state in local storage so the saved Playwright state is actually reusable across browser contexts.
+
+### Environment wrappers
+
+This framework now uses a small config wrapper in `utils/runtimeConfig.ts` on top of the existing `.env.<TEST_ENV>` loading.
+
+Checked-in environment files:
+
+```bash
+.env.testing
+.env.staging
+.env.production
+```
+
+The example test lives in `tests/environment-config.spec.ts` and reads credentials and environment labels from the selected wrapper.
+
+Run the environment examples with:
+
+```bash
+npm run test:staging
+npm run test:production
+```
+
+The checked-in `.env.staging` and `.env.production` files intentionally keep `BASE_URL` empty so the repository stays runnable against the shared demo app. In a real project, those files would normally point to different deployed environments.
 
 ## Retry demo for artifacts
 
@@ -77,27 +134,29 @@ Inside the demo test, `testInfo.retry === 0` is used to force the first run to f
 - `tests/`: Playwright specs for login, navigation, and form flows
 - `pages/`: page objects used by the tests
 - `utils/fixtures.ts`: shared `test` object that wires page objects into each test
-- `utils/testApiServer.ts`: local demo API used by the request-based API tests
+- `utils/testApiServer.ts`: launcher for the shared local demo API used by the request-based API tests
 - `utils/env.ts`: optional `.env.<TEST_ENV>` loading
+- `utils/runtimeConfig.ts`: config wrapper for credentials and selected environment metadata
 - `utils/globalSetup.ts`: early environment validation hook
 - `playwright.config.ts`: retries, workers, reporters, and artifact settings
 
 ## Environment behavior
 
-This project can run with no `.env` file. If `BASE_URL` is not provided, it falls back to the bundled demo app.
+This project can run with no `.env` file. If `BASE_URL` is not provided, it falls back to the shared demo app in `demo-services/test-app/app.html`.
 
 If you want environment-specific config, create files like:
 
 ```bash
 .env.testing
 .env.dev
-.env.demo
+.env.staging
+.env.production
 ```
 
 and run the matching script, for example:
 
 ```bash
-npm run test:dev
+npm run test:staging
 ```
 
 ## Reports and artifacts

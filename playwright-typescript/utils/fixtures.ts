@@ -90,7 +90,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     try {
       await page.goto(resolvedAppUrl, { waitUntil: 'domcontentloaded' });
-      await page.getByTestId('username').waitFor({ timeout: 5_000 });
+      await Promise.race([
+        page.getByTestId('username').waitFor({ state: 'visible', timeout: 5_000 }),
+        page.getByTestId('nav-home').waitFor({ state: 'visible', timeout: 5_000 })
+      ]);
       lastErr = undefined;
       break;
     } catch (err) {

@@ -10,5 +10,5 @@ def app_url() -> str:
         return configured_url
 
     root = Path(__file__).resolve().parents[1]
-    app = root / "tests" / "app.html"
+    app = root.parent / "demo-services" / "test-app" / "app.html"
     return app.resolve().as_uri()

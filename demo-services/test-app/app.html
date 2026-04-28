@@ -102,6 +102,7 @@
     <script>
       const VALID_USER = 'demo';
       const VALID_PASS = 'secret';
+      const AUTH_STORAGE_KEY = 'playwright-demo-auth';
 
       const loginView = document.querySelector('#login-view');
       const appView = document.querySelector('#app-view');
@@ -115,10 +116,21 @@
         }
       }
 
-      function setLoggedIn(username) {
+      function persistSession(username) {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username }));
+      }
+
+      function clearSession() {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+      }
+
+      function setLoggedIn(username, { persist = true } = {}) {
         loginView.classList.add('hidden');
         appView.classList.remove('hidden');
         whoami.textContent = username;
+        if (persist) {
+          persistSession(username);
+        }
         location.hash = '#home';
         show('home');
       }
@@ -127,8 +139,28 @@
         appView.classList.add('hidden');
         loginView.classList.remove('hidden');
         loginError.classList.add('hidden');
+        clearSession();
         document.querySelector('[data-testid="username"]').value = '';
         document.querySelector('[data-testid="password"]').value = '';
+      }
+
+      function restoreSession() {
+        const rawSession = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (!rawSession) {
+          return;
+        }
+
+        try {
+          const session = JSON.parse(rawSession);
+          if (session && typeof session.username === 'string' && session.username.length > 0) {
+            setLoggedIn(session.username, { persist: false });
+            return;
+          }
+        } catch {
+          // Ignore invalid storage and reset it below.
+        }
+
+        clearSession();
       }
 
       document.querySelector('[data-testid="login-btn"]').addEventListener('click', () => {
@@ -169,7 +201,8 @@
         status.textContent = 'Submitted successfully.';
         status.className = 'ok';
       });
+
+      restoreSession();
     </script>
   </body>
 </html>
-

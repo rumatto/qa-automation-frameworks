@@ -6,6 +6,7 @@ import frameworks.seleniumjava.pages.HomePage;
 import frameworks.seleniumjava.pages.LoginPage;
 import frameworks.seleniumjava.pages.SettingsPage;
 import frameworks.seleniumjava.utils.AppUrls;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.Allure;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +18,13 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.ByteArrayInputStream;
 import java.time.Duration;
+import java.util.Locale;
 
 public abstract class BaseTest {
   protected WebDriver driver;
@@ -46,8 +48,15 @@ public abstract class BaseTest {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("--headless=new");
     options.addArguments("--window-size=1280,720");
+    options.addArguments("--no-sandbox");
 
-    driver = new ChromeDriver(options); // Selenium Manager resolves driver
+    String chromeBinary = System.getenv("CHROME_BIN");
+    if (chromeBinary != null && !chromeBinary.isBlank()) {
+      options.setBinary(chromeBinary);
+    }
+
+    resolveChromeDriver(chromeBinary);
+    driver = new ChromeDriver(options);
     Exception lastError = null;
     for (int attempt = 0; attempt < 3; attempt += 1) {
       try {
@@ -93,5 +102,23 @@ public abstract class BaseTest {
     } catch (WebDriverException ignored) {
       // The browser can already be closing on hard failures; skip the attachment in that case.
     }
+  }
+
+  private void resolveChromeDriver(String chromeBinary) {
+    WebDriverManager manager = isChromiumBinary(chromeBinary)
+        ? WebDriverManager.chromiumdriver()
+        : WebDriverManager.chromedriver();
+
+    if (chromeBinary != null && !chromeBinary.isBlank()) {
+      manager.browserBinary(chromeBinary);
+    }
+
+    manager.setup();
+  }
+
+  private boolean isChromiumBinary(String chromeBinary) {
+    return chromeBinary != null
+        && !chromeBinary.isBlank()
+        && chromeBinary.toLowerCase(Locale.ROOT).contains("chromium");
   }
 }

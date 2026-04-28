@@ -15,10 +15,14 @@ import pytest
 import allure
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 
 ROOT = Path(__file__).resolve().parents[1]
+APP_DIR = ROOT.parent / "demo-services" / "test-app"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -27,7 +31,12 @@ from pages.form_page import FormPage
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from pages.settings_page import SettingsPage
-TESTS_DIR = Path(__file__).resolve().parent
+
+
+def resolve_chromedriver(chrome_binary: str | None) -> str:
+    if chrome_binary and "chromium" in Path(chrome_binary).name.lower():
+        return ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    return ChromeDriverManager().install()
 
 
 @pytest.fixture(scope="session")
@@ -37,12 +46,12 @@ def app_base_url():
         yield configured_url
         return
 
-    # Serve tests/ (which contains app.html) over localhost to avoid flaky file:// loads.
+    # Serve the shared demo app over localhost to avoid flaky file:// loads.
     class QuietHandler(SimpleHTTPRequestHandler):
         def log_message(self, *_args):  # noqa: ANN001
             return
 
-    handler = functools.partial(QuietHandler, directory=str(TESTS_DIR))
+    handler = functools.partial(QuietHandler, directory=str(APP_DIR))
     httpd = TCPServer(("127.0.0.1", 0), handler, bind_and_activate=False)
     httpd.allow_reuse_address = True
     httpd.server_bind()
@@ -61,10 +70,18 @@ def driver(app_base_url):
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--window-size=1280,720")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--remote-debugging-pipe")
+    options.add_argument("--disable-gpu")
+    chrome_binary = os.getenv("CHROME_BIN")
+    if chrome_binary:
+        options.binary_location = chrome_binary
     user_data_dir = tempfile.mkdtemp(prefix="selenium-python-chrome-")
     options.add_argument(f"--user-data-dir={user_data_dir}")
 
-    drv = webdriver.Chrome(options=options)  # Selenium Manager resolves driver
+    service = Service(executable_path=resolve_chromedriver(chrome_binary))
+    drv = webdriver.Chrome(service=service, options=options)
     configured_url = os.getenv("BASE_URL")
     url = configured_url if configured_url else f"{app_base_url}/app.html"
     last_err: Exception | None = None

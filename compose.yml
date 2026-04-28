@@ -1,0 +1,69 @@
+services:
+  test-app:
+    build:
+      context: ./demo-services/test-app
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/app.html"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  test-api:
+    build:
+      context: ./demo-services/test-api
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  playwright:
+    build:
+      context: ./playwright-typescript
+    depends_on:
+      test-app:
+        condition: service_healthy
+      test-api:
+        condition: service_healthy
+    environment:
+      BASE_URL: http://test-app/app.html
+      API_BASE_URL: http://test-api:8080
+    shm_size: 2gb
+    volumes:
+      - ./artifacts/playwright/test-results:/app/test-results
+      - ./artifacts/playwright/playwright-report:/app/playwright-report
+      - ./artifacts/playwright/allure-results:/app/allure-results
+
+  selenium-python:
+    build:
+      context: ./selenium-python
+    depends_on:
+      test-app:
+        condition: service_healthy
+    environment:
+      BASE_URL: http://test-app/app.html
+    shm_size: 2gb
+    volumes:
+      - ./artifacts/selenium-python/test-results:/app/test-results
+      - ./artifacts/selenium-python/allure-results:/app/allure-results
+
+  selenium-java:
+    build:
+      context: ./selenium-java
+    depends_on:
+      test-app:
+        condition: service_healthy
+      test-api:
+        condition: service_healthy
+    environment:
+      BASE_URL: http://test-app/app.html
+      API_BASE_URL: http://test-api:8080
+    shm_size: 2gb
+    volumes:
+      - ./artifacts/selenium-java/test-results:/app/build/test-results
+      - ./artifacts/selenium-java/allure-results:/app/build/allure-results
+      - ./artifacts/selenium-java/allure-report:/app/build/reports/allure-report

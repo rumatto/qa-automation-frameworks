@@ -1,121 +1,97 @@
-import http, { type IncomingMessage, type ServerResponse } from 'node:http';
-import { DEMO_USER, type ContactRequest, validateContactRequest } from './testApi';
+import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+import net from 'node:net';
+import path from 'node:path';
 
 type StartedServer = {
   url: string;
   close: () => Promise<void>;
 };
 
-function readJsonBody(request: IncomingMessage): Promise<ContactRequest> {
-  return new Promise((resolve, reject) => {
-    let body = '';
+async function waitForHealthcheck(url: string): Promise<void> {
+  let lastError: unknown;
 
-    request.setEncoding('utf8');
-    request.on('data', (chunk) => {
-      body += chunk;
-    });
-    request.on('end', () => {
-      if (!body) {
-        resolve({});
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      const response = await fetch(`${url}/api/health`);
+      if (response.ok) {
+        return;
+      }
+      lastError = new Error(`Healthcheck returned ${response.status}.`);
+    } catch (error) {
+      lastError = error;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Shared test API did not start.');
+}
+
+function stopProcess(child: ChildProcessWithoutNullStreams): Promise<void> {
+  return new Promise((resolve) => {
+    if (child.exitCode !== null || child.signalCode !== null) {
+      resolve();
+      return;
+    }
+
+    child.once('exit', () => resolve());
+    child.kill();
+  });
+}
+
+function findOpenPort(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      if (!address || typeof address === 'string') {
+        server.close(() => reject(new Error('Unable to determine open port.')));
         return;
       }
 
-      try {
-        resolve(JSON.parse(body) as ContactRequest);
-      } catch (error) {
-        reject(error);
-      }
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(address.port);
+      });
     });
-    request.on('error', reject);
   });
-}
-
-function writeJson(response: ServerResponse, statusCode: number, payload: unknown): void {
-  const body = JSON.stringify(payload);
-  response.writeHead(statusCode, {
-    'content-type': 'application/json; charset=utf-8',
-    'content-length': Buffer.byteLength(body)
-  });
-  response.end(body);
 }
 
 export async function startTestApiServer(): Promise<StartedServer> {
-  const server = http.createServer(async (request, response) => {
-    const method = request.method ?? 'GET';
-    const url = new URL(request.url ?? '/', 'http://127.0.0.1');
-
-    if (method === 'GET' && url.pathname === '/api/health') {
-      writeJson(response, 200, { status: 'ok' });
-      return;
-    }
-
-    if (method === 'GET' && url.pathname === '/api/users/demo') {
-      writeJson(response, 200, { user: DEMO_USER });
-      return;
-    }
-
-    if (method === 'POST' && url.pathname === '/api/messages') {
-      try {
-        const payload = await readJsonBody(request);
-        const validation = validateContactRequest(payload);
-
-        if (!validation.valid) {
-          writeJson(response, 400, {
-            status: 'error',
-            message: validation.error
-          });
-          return;
-        }
-
-        writeJson(response, 201, {
-          status: 'accepted',
-          messageId: 'msg-001',
-          submittedAt: '2026-04-25T12:00:00Z',
-          echo: {
-            email: payload.email?.trim(),
-            message: payload.message?.trim()
-          }
-        });
-      } catch {
-        writeJson(response, 400, {
-          status: 'error',
-          message: 'Request body must be valid JSON.'
-        });
-      }
-      return;
-    }
-
-    writeJson(response, 404, {
-      status: 'error',
-      message: 'Not found'
-    });
+  const port = await findOpenPort();
+  const scriptPath = path.resolve(__dirname, '../../demo-services/test-api/server.js');
+  const child = spawn('node', [scriptPath], {
+    env: {
+      ...process.env,
+      PORT: String(port)
+    },
+    stdio: 'pipe'
   });
 
-  await new Promise<void>((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      server.off('error', reject);
-      resolve();
-    });
+  const stderr: string[] = [];
+  child.stderr.on('data', (chunk) => {
+    stderr.push(chunk.toString('utf8'));
   });
 
-  const address = server.address();
-  if (!address || typeof address === 'string') {
-    throw new Error('Unable to determine API server address.');
+  const url = `http://127.0.0.1:${port}`;
+  try {
+    await waitForHealthcheck(url);
+  } catch (error) {
+    await stopProcess(child);
+    const stderrText = stderr.join('').trim();
+    const detail = stderrText ? `\n${stderrText}` : '';
+    throw new Error(`Unable to start shared test API.${detail}`, { cause: error });
   }
 
   return {
-    url: `http://127.0.0.1:${address.port}`,
+    url,
     close: async () => {
-      await new Promise<void>((resolve, reject) => {
-        server.close((error) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve();
-        });
-      });
+      await stopProcess(child);
     }
   };
 }

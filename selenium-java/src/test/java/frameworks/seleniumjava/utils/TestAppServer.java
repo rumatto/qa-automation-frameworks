@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
-import java.net.URL;
+import java.nio.file.Files;
 
 public final class TestAppServer {
   private static HttpServer server;
@@ -21,12 +21,10 @@ public final class TestAppServer {
     }
 
     try {
-      URL resource = TestAppServer.class.getClassLoader().getResource("app.html");
-      if (resource == null) {
-        throw new IllegalStateException("app.html not found on classpath");
+      byte[] appBytes = Files.readAllBytes(SharedDemoPaths.appHtml());
+      if (appBytes.length == 0) {
+        throw new IllegalStateException("Shared demo app is empty.");
       }
-
-      byte[] appBytes = resource.openStream().readAllBytes();
       server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
       server.createContext("/app.html", exchange -> writeHtml(exchange, appBytes));
       server.start();

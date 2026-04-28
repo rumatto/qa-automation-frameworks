@@ -1,6 +1,6 @@
 import { allure } from 'allure-playwright';
 import { expect, test } from '../utils/fixtures';
-import { VALID_CREDENTIALS } from '../utils/testApp';
+import { runtimeConfig } from '../utils/runtimeConfig';
 
 test.describe('Demo retry flow', () => {
   test.describe.configure({ retries: 1 });
@@ -10,7 +10,7 @@ test.describe('Demo retry flow', () => {
 
     console.log(`Demo retry attempt ${testInfo.retry + 1} started`);
 
-    await loginPage.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password);
+    await loginPage.login(runtimeConfig.credentials.username, runtimeConfig.credentials.password);
 
     const title = await homePage.getTitle();
     expect(title).toContain('Welcome');
@@ -27,7 +27,7 @@ test.describe('Demo retry flow', () => {
     }
 
     const whoAmI = await homePage.getTextWhoAmI();
-    expect(whoAmI).toContain(VALID_CREDENTIALS.username);
+    expect(whoAmI).toContain(runtimeConfig.credentials.username);
     console.log(`Demo retry attempt ${testInfo.retry + 1} passed`);
   });
 });

@@ -64,6 +64,8 @@ cd selenium-java
 ./gradlew apiTest
 ```
 
+ChromeDriver is resolved automatically with Bonigarcia `WebDriverManager`.
+
 ### Selenium Python
 
 ```bash
@@ -74,20 +76,111 @@ pip install -r requirements.txt
 pytest -q
 ```
 
+ChromeDriver is resolved automatically with `webdriver-manager`.
+
 ### Playwright TypeScript
 
 ```bash
 cd playwright-typescript
 npm install
-npx playwright install
+npx playwright install chromium
 npx playwright test
 ```
+
+Playwright manages its own Chromium binary directly, so there is no separate driver setup.
 
 For the retry demo that fails once to generate screenshot, video, and retry trace artifacts:
 
 ```bash
 cd playwright-typescript
 npm run test:demo
+```
+
+## Local Docker Setup
+
+Each framework now includes its own `Dockerfile`, and the repo root provides a shared `compose.yml`.
+
+### Prerequisites
+
+Install a local Docker runtime with Compose support:
+
+- Docker Desktop, or
+- Docker Engine + `docker compose` plugin
+
+Verify the setup from the repo root:
+
+```bash
+docker --version
+docker compose version
+```
+
+### Shared demo environment
+
+When run through Compose, the frameworks target shared demo services:
+
+- `test-app` serves the demo UI at `http://test-app/app.html`
+- `test-api` serves the demo API at `http://test-api:8080`
+
+The shared demo sources live under `demo-services/` and are reused by local fallback runs as well as Docker.
+
+They are also published on the host for inspection during local Docker runs:
+
+- `http://localhost:3000/app.html`
+- `http://localhost:8080/api/health`
+- `http://localhost:8080/api/users/demo`
+
+Start the shared demo services for browser or API inspection:
+
+```bash
+docker compose up --build test-app test-api
+```
+
+### Run the full stack
+
+Build and run every framework:
+
+```bash
+docker compose up --build
+```
+
+### Run one framework
+
+Run one framework while Compose starts any required shared services automatically:
+
+```bash
+docker compose up --build playwright
+docker compose up --build selenium-python
+docker compose up --build selenium-java
+```
+
+### View artifacts
+
+Container outputs are exported under `artifacts/` so reports and screenshots remain available after the containers exit.
+
+Main artifact folders:
+
+- `artifacts/playwright/`
+- `artifacts/selenium-python/`
+- `artifacts/selenium-java/`
+
+For `selenium-java`, the main exported folders are:
+
+- `artifacts/selenium-java/test-results/`
+- `artifacts/selenium-java/allure-results/`
+- `artifacts/selenium-java/allure-report/`
+
+### Stop containers
+
+Stop the running services and remove the containers:
+
+```bash
+docker compose down
+```
+
+Rebuild from scratch when you need fresh containers:
+
+```bash
+docker compose up --build --force-recreate
 ```
 
 ## Recruiter Keywords

@@ -21,12 +21,14 @@ ext {
   junitPlatformVersion = '1.10.2'
   seleniumVersion = '4.21.0'
   restAssuredVersion = '5.5.1'
+  webDriverManagerVersion = '6.3.4'
 }
 
 dependencies {
   testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
   testRuntimeOnly "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
   testImplementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+  testImplementation "io.github.bonigarcia:webdrivermanager:${webDriverManagerVersion}"
   testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
   testImplementation "io.rest-assured:json-schema-validator:${restAssuredVersion}"
   testImplementation 'io.qameta.allure:allure-junit5:2.25.0'

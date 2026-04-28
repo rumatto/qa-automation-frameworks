@@ -6,7 +6,10 @@
   "scripts": {
     "test": "cross-env TEST_ENV=testing playwright test",
     "test:dev": "cross-env TEST_ENV=dev playwright test",
+    "test:staging": "cross-env TEST_ENV=staging playwright test tests/environment-config.spec.ts",
+    "test:production": "cross-env TEST_ENV=production playwright test tests/environment-config.spec.ts",
     "test:demo": "cross-env TEST_ENV=testing playwright test tests/demo-rerun.spec.ts",
+    "test:auth-state": "cross-env TEST_ENV=testing playwright test tests/auth-state.spec.ts",
     "test:headed": "cross-env TEST_ENV=testing playwright test --headed",
     "test:ui": "cross-env TEST_ENV=testing playwright test --ui",
     "allure:generate": "allure generate allure-results --clean -o allure-report",

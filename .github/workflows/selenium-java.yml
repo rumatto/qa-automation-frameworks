@@ -1,4 +1,5 @@
 name: Selenium (Java)
+
 on:
   push:
     paths:
@@ -20,25 +21,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    defaults:
-      run:
-        working-directory: selenium-java
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
+      - name: Run tests in Docker
+        run: docker compose up --build --abort-on-container-exit --exit-code-from selenium-java selenium-java
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Run Gradle tests
-        run: ./gradlew test --no-daemon
+      - name: Stop Docker services
+        if: always()
+        run: docker compose down -v
 
       - name: Get Allure history
         uses: actions/checkout@v4
@@ -52,10 +44,10 @@ jobs:
         if: always()
         uses: simple-elf/allure-report-action@v1.13
         with:
-          allure_results: selenium-java/build/allure-results
-          allure_report: selenium-java/allure-report
+          allure_results: artifacts/selenium-java/allure-results
+          allure_report: artifacts/selenium-java/allure-report
           gh_pages: gh-pages
-          allure_history: selenium-java/allure-history
+          allure_history: artifacts/selenium-java/allure-history
           subfolder: selenium-java
 
       - name: Deploy Allure report to GitHub Pages
@@ -63,5 +55,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: selenium-java/allure-history/selenium-java
+          publish_dir: artifacts/selenium-java/allure-history/selenium-java
           destination_dir: selenium-java

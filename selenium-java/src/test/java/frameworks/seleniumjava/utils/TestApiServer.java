@@ -1,16 +1,16 @@
 package frameworks.seleniumjava.utils;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
+import java.net.ServerSocket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public final class TestApiServer {
-  private static HttpServer server;
+  private static Process process;
   private static String baseUrl;
 
   private TestApiServer() {}
@@ -25,101 +25,75 @@ public final class TestApiServer {
       return baseUrl;
     }
 
-    try {
-      server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-      server.createContext("/api/health", exchange ->
-          writeJson(exchange, 200, "{\"status\":\"ok\"}"));
-      server.createContext("/api/users/demo", exchange ->
-          writeJson(exchange, 200,
-              "{\"user\":{\"id\":101,\"username\":\"demo\",\"role\":\"qa-engineer\",\"features\":[\"ui\",\"api\",\"reporting\"]}}"));
-      server.createContext("/api/messages", TestApiServer::handleMessages);
-      server.start();
+    int port = findOpenPort();
+    ProcessBuilder builder = new ProcessBuilder("node", SharedDemoPaths.testApiScript().toString());
+    builder.environment().put("PORT", Integer.toString(port));
+    builder.redirectErrorStream(true);
 
-      baseUrl = "http://127.0.0.1:" + server.getAddress().getPort();
+    try {
+      process = builder.start();
+      baseUrl = "http://127.0.0.1:" + port;
+      waitForHealthcheck(baseUrl);
       Runtime.getRuntime().addShutdownHook(new Thread(TestApiServer::stopQuietly));
       return baseUrl;
+    } catch (IOException | InterruptedException error) {
+      stopQuietly();
+      throw new IllegalStateException("Unable to start the shared local API server", error);
+    }
+  }
+
+  private static int findOpenPort() {
+    try (ServerSocket socket = new ServerSocket(0)) {
+      return socket.getLocalPort();
     } catch (IOException error) {
-      throw new UncheckedIOException("Unable to start the local API server", error);
+      throw new IllegalStateException("Unable to allocate an open port", error);
     }
   }
 
-  private static void handleMessages(HttpExchange exchange) throws IOException {
-    if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-      writeJson(exchange, 405, "{\"status\":\"error\",\"message\":\"Method not allowed\"}");
-      return;
+  private static void waitForHealthcheck(String serverBaseUrl) throws IOException, InterruptedException {
+    HttpClient client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(2))
+        .build();
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(serverBaseUrl + "/api/health"))
+        .timeout(Duration.ofSeconds(2))
+        .GET()
+        .build();
+
+    IOException lastIoError = null;
+    InterruptedException lastInterrupt = null;
+    for (int attempt = 0; attempt < 20; attempt += 1) {
+      try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 200) {
+          return;
+        }
+        lastIoError = new IOException("Healthcheck returned status " + response.statusCode());
+      } catch (IOException error) {
+        lastIoError = error;
+      } catch (InterruptedException error) {
+        lastInterrupt = error;
+      }
+      TimeUnit.MILLISECONDS.sleep(250);
     }
 
-    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-    String email = extractJsonString(body, "email");
-    String message = extractJsonString(body, "message");
-
-    if (!isValidEmail(email)) {
-      writeJson(exchange, 400, "{\"status\":\"error\",\"message\":\"A valid email is required.\"}");
-      return;
+    if (lastInterrupt != null) {
+      throw lastInterrupt;
     }
-
-    if (message == null || message.trim().length() < 10) {
-      writeJson(exchange, 400, "{\"status\":\"error\",\"message\":\"Message must be at least 10 characters long.\"}");
-      return;
-    }
-
-    writeJson(
-        exchange,
-        201,
-        "{\"status\":\"accepted\",\"messageId\":\"msg-001\",\"submittedAt\":\"2026-04-25T12:00:00Z\","
-            + "\"echo\":{\"email\":\"" + escapeJson(email.trim()) + "\",\"message\":\"" + escapeJson(message.trim()) + "\"}}"
-    );
-  }
-
-  private static String extractJsonString(String body, String field) {
-    String pattern = "\"" + field + "\"";
-    int fieldIndex = body.indexOf(pattern);
-    if (fieldIndex < 0) {
-      return null;
-    }
-
-    int colonIndex = body.indexOf(':', fieldIndex + pattern.length());
-    if (colonIndex < 0) {
-      return null;
-    }
-
-    int firstQuote = body.indexOf('"', colonIndex + 1);
-    if (firstQuote < 0) {
-      return null;
-    }
-
-    int secondQuote = body.indexOf('"', firstQuote + 1);
-    if (secondQuote < 0) {
-      return null;
-    }
-
-    return body.substring(firstQuote + 1, secondQuote);
-  }
-
-  private static boolean isValidEmail(String value) {
-    return value != null && value.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
-  }
-
-  private static String escapeJson(String value) {
-    return value.replace("\\", "\\\\").replace("\"", "\\\"");
-  }
-
-  private static void writeJson(HttpExchange exchange, int statusCode, String body) throws IOException {
-    byte[] payload = body.getBytes(StandardCharsets.UTF_8);
-    exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
-    exchange.sendResponseHeaders(statusCode, payload.length);
-    try (OutputStream output = exchange.getResponseBody()) {
-      output.write(payload);
-    } finally {
-      exchange.close();
-    }
+    throw lastIoError != null ? lastIoError : new IOException("Shared local API server did not start");
   }
 
   private static synchronized void stopQuietly() {
-    if (server != null) {
-      server.stop(0);
-      server = null;
-      baseUrl = null;
+    if (process != null) {
+      process.destroy();
+      try {
+        process.waitFor(5, TimeUnit.SECONDS);
+      } catch (InterruptedException ignored) {
+        Thread.currentThread().interrupt();
+      } finally {
+        process = null;
+        baseUrl = null;
+      }
     }
   }
 }
