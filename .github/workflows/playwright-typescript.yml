@@ -33,22 +33,12 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
-          cache: npm
-          cache-dependency-path: playwright-typescript/package-lock.json
 
       - name: Install deps
         run: npm ci
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('playwright-typescript/package-lock.json') }}
-
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
 
       - name: Run tests
         run: npx playwright test
