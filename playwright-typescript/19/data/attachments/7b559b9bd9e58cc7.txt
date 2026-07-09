@@ -1,0 +1,1 @@
+Intentional failure on the first attempt to generate screenshot, video, and retry trace artifacts.
