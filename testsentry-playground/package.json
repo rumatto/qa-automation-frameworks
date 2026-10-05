@@ -1,0 +1,14 @@
+{
+  "name": "testsentry-playground",
+  "version": "0.1.0",
+  "description": "Intentionally broken Playwright project for TestSentry demo/validation.",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "reset:treatments": "node scripts/reset-treatments.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "typescript": "^5.4.0"
+  }
+}
