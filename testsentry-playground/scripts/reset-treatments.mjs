@@ -2,7 +2,7 @@
 //
 // Apply tests mutate the live fixture files under tests/ to apply patch
 // treatments. This script copies the known-good baseline snapshots from
-// baselines/ back into tests/ so the playground returns to its
+// __baselines__ back into tests/ so the playground returns to its
 // intended broken-by-design state.
 //
 // Behavior:
@@ -15,7 +15,7 @@ import { resolve } from 'node:path';
 
 const repoRoot = resolve(import.meta.dirname, '..');
 
-const baselinesDir = resolve(repoRoot, 'baselines');
+const baselinesDir = resolve(repoRoot, '__baselines__');
 const testsDir = resolve(repoRoot, 'tests');
 
 // Known fixture files that may be mutated by Apply tests and must be restorable.
