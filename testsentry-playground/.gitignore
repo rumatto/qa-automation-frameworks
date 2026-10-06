@@ -1,0 +1,9 @@
+.auth/
+test-results/
+playwright-report/
+report.html
+report.json
+report2.html
+report2.json
+testsentry-report*.html
+testsentry-report*.json

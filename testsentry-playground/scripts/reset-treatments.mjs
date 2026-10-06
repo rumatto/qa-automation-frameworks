@@ -19,7 +19,13 @@ const baselinesDir = resolve(repoRoot, '__baselines__');
 const testsDir = resolve(repoRoot, 'tests');
 
 // Known fixture files that may be mutated by Apply tests and must be restorable.
-const fixtureFiles = ['intentional-bugs.spec.ts', 'locator-healing-fixture.spec.ts'];
+const fixtureFiles = [
+  'intentional-bugs.spec.ts',
+  'locator-healing-fixture.spec.ts',
+  'no-assertions.spec.ts',
+  'shared-setup.spec.ts',
+  'unsupported-edge.spec.ts',
+];
 
 let failed = false;
 
