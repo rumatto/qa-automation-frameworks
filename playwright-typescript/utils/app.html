@@ -3,43 +3,144 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Playwright Demo App</title>
+    <title>Acme Portal</title>
     <style>
+      :root {
+        --ink: #0f172a;
+        --muted: #475569;
+        --line: #e2e8f0;
+        --accent: #16a34a;
+        --accent-dark: #15803d;
+      }
+      * {
+        box-sizing: border-box;
+      }
       body {
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-        margin: 24px;
+        font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 28px;
+        color: var(--ink);
+      }
+      html {
+        background: linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%) fixed;
       }
       .card {
         max-width: 720px;
-        padding: 16px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
+        margin: 0 auto;
+        padding: 32px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+      }
+      h1 {
+        margin: 0 0 20px;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+        border-left: 6px solid var(--accent);
+        padding-left: 14px;
+      }
+      h2 {
+        margin: 8px 0 4px;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+      }
+      p {
+        color: var(--muted);
+        font-size: 18px;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
       nav a {
-        margin-right: 12px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        color: var(--muted);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      nav a:hover {
+        background: #f1f5f9;
+        color: var(--ink);
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid var(--line);
+        margin: 16px 0;
       }
       .hidden {
         display: none;
       }
       .error {
-        color: #b00020;
+        margin-top: 14px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: #fef2f2;
+        color: #b91c1c;
+        font-weight: 600;
       }
       .ok {
-        color: #0b6;
+        color: var(--accent-dark);
+        font-weight: 600;
       }
       label {
         display: block;
-        margin-top: 12px;
+        margin-top: 16px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #334155;
       }
       input,
       textarea {
+        display: block;
         width: 100%;
-        padding: 8px;
-        margin-top: 6px;
+        padding: 13px 14px;
+        margin-top: 8px;
+        font: inherit;
+        font-weight: 400;
+        color: var(--ink);
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      input:focus,
+      textarea:focus {
+        border-color: var(--accent);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.18);
       }
       button {
-        margin-top: 12px;
-        padding: 10px 14px;
+        margin-top: 20px;
+        padding: 12px 22px;
+        font: inherit;
+        font-weight: 700;
+        color: #fff;
+        background: var(--accent);
+        border: 0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.05s;
+      }
+      button:hover {
+        background: var(--accent-dark);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      [data-testid='logout-btn'] {
+        margin-top: 0;
+        margin-left: auto;
+        padding: 8px 16px;
+        color: var(--muted);
+        background: #fff;
+        border: 1.5px solid #cbd5e1;
+      }
+      [data-testid='logout-btn']:hover {
+        background: #f1f5f9;
       }
       #status {
         margin-top: 12px;
@@ -48,10 +149,10 @@
   </head>
   <body>
     <div class="card">
-      <h1 data-testid="app-title">Playwright Demo App</h1>
+      <h1 data-testid="app-title">Acme Portal</h1>
 
       <section id="login-view">
-        <h2>Login</h2>
+        <h2>Sign in to your account</h2>
         <label>
           Username
           <input data-testid="username" autocomplete="off" />

@@ -1,0 +1,5 @@
+MAVEN_PROJECTBASEDIR="${MAVEN_PROJECTBASEDIR:-$(cd "$(dirname "$0")" && pwd)}"
+MAVEN_WRAPPER_JAR="${MAVEN_WRAPPER_JAR:-${MAVEN_PROJECTBASEDIR}/.mvn/wrapper/maven-wrapper.jar}"
+MAVEN_CMD="${MAVEN_CMD:-mvn}"
+MAVEN_CONFIG="${MAVEN_CONFIG:-.mvn/maven.config}"
+MAVEN_OPTS="${MAVEN_OPTS:--Dmaven.artifact.threads=8}"

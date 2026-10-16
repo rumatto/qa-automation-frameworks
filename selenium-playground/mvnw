@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Maven Wrapper for selenium-playground
+# Prefers a cached Maven distribution from the wrapper cache, falls back to system mvn.
+
+MAVEN_DIST_ROOT="${HOME}/.m2/wrapper/dists"
+
+# Try to find the Maven mvn binary in the wrapper cache
+MAVEN_MVN=""
+for dist_dir in "${MAVEN_DIST_ROOT}"/*/; do
+    for hash_dir in "${dist_dir}"*/; do
+        for maven_dir in "${hash_dir}"apache-maven-*/; do
+            if [ -x "${maven_dir}bin/mvn" ]; then
+                MAVEN_MVN="${maven_dir}bin/mvn"
+                break 3
+            fi
+        done
+    done
+done
+
+if [ -z "$MAVEN_MVN" ]; then
+    # Fallback: search with a broader pattern
+    for found in "${MAVEN_DIST_ROOT}"/*/bin/mvn "${MAVEN_DIST_ROOT}"/*/*/bin/mvn "${MAVEN_DIST_ROOT}"/*/*/*/bin/mvn; do
+        if [ -x "$found" ]; then
+            MAVEN_MVN="$found"
+            break
+        fi
+    done
+fi
+
+if [ -n "$MAVEN_MVN" ] && [ -x "$MAVEN_MVN" ]; then
+    exec "$MAVEN_MVN" "$@"
+else
+    echo "Error: Maven distribution not found in wrapper cache." >&2
+    echo "Install Maven or place apache-maven-3.9.8-bin.tar.gz in ${MAVEN_DIST_ROOT}" >&2
+    exit 1
+fi
