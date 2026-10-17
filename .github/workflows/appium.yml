@@ -90,20 +90,16 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        uses: simple-elf/allure-report-action@v1.15
-        with:
-          allure_results: appium-python/allure-results
-          allure_report: appium-python/allure-report
-          gh_pages: gh-pages
-          allure_history: appium-python/allure-history
-          subfolder: appium-python
+        run: |
+          npm install -g allure-commandline
+          allure generate appium-python/allure-results -o appium-python/allure-report --clean || true
 
       - name: Deploy Allure report to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: appium-python/allure-history/appium-python
+          publish_dir: appium-python/allure-report
           destination_dir: appium-python
 
       - name: Upload test artifacts
