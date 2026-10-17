@@ -1,1 +1,10 @@
 /.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Appium test artifacts
+appium-python/test-results/

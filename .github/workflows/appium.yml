@@ -1,0 +1,98 @@
+name: Appium (Python)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'appium-python/**'
+      - 'android-demo-app/**'
+      - '.github/workflows/appium.yml'
+  pull_request:
+    paths:
+      - 'appium-python/**'
+      - 'android-demo-app/**'
+      - '.github/workflows/appium.yml'
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    env:
+      ANDROID_HOME: ${{ runner.temp }}/android-sdk
+      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+      JAVA_HOME: ${{ runner.temp }}/java-home
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Install Android SDK command-line tools
+        run: |
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl -sL https://dl.google.com/android/repository/commandlinetools-mac-11076708_latest.zip -o cmdline-tools.zip
+          unzip -q cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+          rm cmdline-tools.zip
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager "platform-tools" "emulator" "build-tools;34.0.0" \
+            "platforms;android-33" \
+            "system-images;android-33;google_apis;x86_64"
+
+      - name: Create AVD (Pixel 6a, API 33)
+        run: |
+          echo "no" | avdmanager create avd -n pixel6a -k "system-images;android-33;google_apis;x86_64" -d "pixel_6a"
+
+      - name: Start Android emulator
+        run: |
+          "$ANDROID_HOME/emulator/emulator" -avd pixel6a -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
+          for i in $(seq 1 180); do
+            if [ "$(adb shell getprop sys.boot_completed 2>/dev/null)" = "1" ]; then
+              echo "Emulator booted after ~${i}s"
+              break
+            fi
+            sleep 1
+          done
+          adb devices
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Appium
+        run: npm install -g appium@latest
+
+      - name: Install Python dependencies
+        working-directory: appium-python
+        run: pip install -r requirements.txt
+
+      - name: Build debug APK
+        working-directory: android-demo-app
+        run: ./gradlew assembleDebug
+
+      - name: Run Appium tests
+        working-directory: appium-python
+        env:
+          ANDROID_DEVICE_NAME: "Android Emulator"
+          ANDROID_PLATFORM_VERSION: "13"
+          APK_PATH: ${{ github.workspace }}/android-demo-app/app/build/outputs/apk/debug/app-debug.apk
+        run: pytest
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appium-test-results
+          path: appium-python/test-results/
+          retention-days: 7
