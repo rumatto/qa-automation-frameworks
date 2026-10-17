@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Android Demo App</string>
+    <string name="app_title">Android Demo App</string>
+    <string name="login_heading">Login</string>
+    <string name="login_username">Username</string>
+    <string name="login_password">Password</string>
+    <string name="login_submit">Sign in</string>
+    <string name="login_error">Invalid credentials</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_form">Form</string>
+    <string name="nav_logout">Logout</string>
+    <string name="home_heading">Home</string>
+    <string name="home_welcome">Welcome,</string>
+    <string name="settings_heading">Settings</string>
+    <string name="settings_text">Preferences live here.</string>
+    <string name="form_heading">Contact</string>
+    <string name="form_email">Email</string>
+    <string name="form_message">Message</string>
+    <string name="form_submit">Submit</string>
+    <string name="form_error_validation">Please enter a valid email and a message with at least 10 characters.</string>
+    <string name="form_status_submitting">Submitting message...</string>
+    <string name="form_status_success">Submitted successfully.</string>
+    <string name="form_status_error">Submission failed. Check the demo API server and try again.</string>
+    <string name="profile_status_idle">Profile details will load after sign-in.</string>
+    <string name="profile_status_loading">Loading demo profile...</string>
+    <string name="profile_status_loaded">Role: %1$s. Features: %2$s.</string>
+    <string name="profile_status_error">Could not reach %1$s.</string>
+</resources>
