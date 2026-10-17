@@ -18,9 +18,8 @@ jobs:
     runs-on: macos-latest
 
     env:
-      ANDROID_HOME: ${{ runner.temp }}/android-sdk
-      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
-      JAVA_HOME: ${{ runner.temp }}/java-home
+      ANDROID_HOME: ${{ github.workspace }}/.android-sdk
+      ANDROID_SDK_ROOT: ${{ github.workspace }}/.android-sdk
 
     steps:
       - uses: actions/checkout@v4
