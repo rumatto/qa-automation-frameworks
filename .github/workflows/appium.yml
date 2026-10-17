@@ -45,11 +45,11 @@ jobs:
           yes | sdkmanager --licenses >/dev/null 2>&1 || true
           sdkmanager "platform-tools" "emulator" "build-tools;34.0.0" \
             "platforms;android-33" \
-            "system-images;android-33;google_apis;x86_64"
+            "system-images;android-33;google_apis;arm64-v8a"
 
       - name: Create AVD (Pixel 6a, API 33)
         run: |
-          echo "no" | avdmanager create avd -n pixel6a -k "system-images;android-33;google_apis;x86_64" -d "pixel_6a"
+          echo "no" | avdmanager create avd -n pixel6a -k "system-images;android-33;google_apis;arm64-v8a" -d "pixel_6a"
 
       - name: Start Android emulator
         run: |
