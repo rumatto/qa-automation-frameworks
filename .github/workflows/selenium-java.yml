@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        uses: simple-elf/allure-report-action@v1.13
+        uses: simple-elf/allure-report-action@v1.15
         with:
           allure_results: selenium-java/build/allure-results
           allure_report: selenium-java/allure-report
@@ -60,7 +60,7 @@ jobs:
 
       - name: Deploy Allure report to GitHub Pages
         if: always()
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: selenium-java/allure-history/selenium-java
