@@ -53,7 +53,7 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        uses: simple-elf/allure-report-action@v1.13
+        uses: simple-elf/allure-report-action@v1.15
         with:
           allure_results: selenium-python/allure-results
           allure_report: selenium-python/allure-report

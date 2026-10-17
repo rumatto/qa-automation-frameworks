@@ -44,7 +44,7 @@ jobs:
         run: npx playwright test
 
       - name: Get Allure history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.0
         if: always()
         continue-on-error: true
         with:
@@ -53,7 +53,7 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        uses: simple-elf/allure-report-action@v1.13
+        uses: simple-elf/allure-report-action@v1.15
         with:
           allure_results: playwright-typescript/allure-results
           allure_report: playwright-typescript/allure-report
