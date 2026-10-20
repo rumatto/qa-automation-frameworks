@@ -42,4 +42,6 @@ After applying TestSentry treatments, restore the intentional-bug baseline:
 ```
 
 This copies `__baselines__/IntentionalBugsTest.java` over
-`src/test/java/tests/IntentionalBugsTest.java`.
+`src/test/java/tests/IntentionalBugsTest.java` and removes the generated Java
+build artifacts (`target/`, `build/`, `.gradle/`, stray `*.class` files) that
+TestSentry validation creates while recompiling the fixture.
