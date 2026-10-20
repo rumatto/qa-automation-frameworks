@@ -1,1 +1,7 @@
 .testsentry/
+
+# Java build artifacts (recreated by the Maven/Gradle validation runs)
+target/
+build/
+.gradle/
+*.class
