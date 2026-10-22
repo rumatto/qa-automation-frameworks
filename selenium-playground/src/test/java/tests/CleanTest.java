@@ -1,10 +1,13 @@
 package tests;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -17,9 +20,28 @@ import java.time.Duration;
  */
 class CleanTest {
 
+  private WebDriver driver;
+
+  @BeforeEach
+  void startBrowser() {
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless=new");
+    driver = new ChromeDriver(options);
+  }
+
+  @AfterEach
+  void stopBrowser() {
+    if (driver != null) {
+      try {
+        driver.quit();
+      } finally {
+        driver = null;
+      }
+    }
+  }
+
   @Test
   void cleanLoginFlow() {
-    WebDriver driver = new ChromeDriver();
     driver.get("https://example.com");
 
     WebElement username = driver.findElement(By.id("username"));
@@ -34,12 +56,10 @@ class CleanTest {
     WebElement welcome = driver.findElement(By.className("welcome-banner"));
     assert welcome.isDisplayed();
 
-    driver.quit();
   }
 
   @Test
   void cleanWaitForElement() {
-    WebDriver driver = new ChromeDriver();
     driver.get("https://example.com");
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -48,6 +68,5 @@ class CleanTest {
     );
     assert dynamicElement.isDisplayed();
 
-    driver.quit();
   }
 }

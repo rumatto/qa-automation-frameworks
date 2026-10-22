@@ -23,6 +23,17 @@ TestSentry's Selenium Java scanner and treatment selection.
 ./mvnw test-compile
 ```
 
+Run the test suite with:
+
+```bash
+./mvnw test
+```
+
+Chrome runs headless (`--headless=new`) and every WebDriver is closed in an
+`@AfterEach` hook, so no Chrome or ChromeDriver process is left behind. The
+suite intentionally ends in BUILD FAILURE: the intentional bug cases are
+expected to fail.
+
 ## Reset treatment fixtures
 
 After applying TestSentry treatments:
