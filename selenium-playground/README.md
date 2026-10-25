@@ -1,31 +1,21 @@
 # Selenium Playground
 
 A minimal Maven-based Java 17 + Selenium WebDriver + JUnit 5 project for testing
-TestSentry's Selenium Java scanner.
+TestSentry's Selenium Java scanner and treatment selection.
 
-## Structure
+## Acceptance coverage
 
-- `CleanTest.java` — clean Selenium tests with no intentional issues (stable locators, explicit waits).
-- `IntentionalBugsTest.java` — tests containing clearly-marked patterns that TestSentry detects.
-
-## Playground scenarios
-
-### Intentional bugs (IntentionalBugsTest.java)
-
-| Category | Pattern | Finding | Treatment |
-|---|---|---|---|
-| Fixed timeout | `Thread.sleep(...)` | Fixed Timeout | none |
-| Implicit wait | `implicitlyWait(...)` | Implicit Wait | none |
-| Exact-ID XPath | `By.xpath("//*[@id='...']")` | Fragile XPath | `By.id(...)` |
-| Class-based XPath | `By.xpath("//button[contains(@class, 'submit')]")` | Fragile XPath | none |
-| Structural XPath | `By.xpath("//div[3]/ul/li[2]/a")` | Fragile XPath | none |
-| Fragile CSS | `By.cssSelector("div.item:nth-child(3)")` | Fragile CSS | none |
-
-### Clean counterparts (CleanTest.java)
-
-- `By.id(...)` — stable ID locators
-- `WebDriverWait` with `ExpectedConditions` — explicit condition-based waits
-- `By.className(...)`, `By.id(...)` — no brittle selectors
+| Category | Pattern | Expected treatment |
+|---|---|---|
+| Fixed timeout | `Thread.sleep(...)` | manual guidance |
+| Implicit wait | `implicitlyWait(...)` | manual guidance |
+| Exact ID XPath | `//*[@id='...']` | `By.id(...)` patch |
+| Exact name XPath | `//*[@name='...']` | `By.name(...)` patch |
+| Exact data-testid XPath | `//*[@data-testid='...']` | stable CSS attribute patch |
+| Relative data-* / aria-* XPath | `.//tag[@attr='...']` | scoped CSS patch |
+| Relative tag XPath | `.//button` | `By.tagName(...)` patch |
+| contains()/structural XPath | unsupported deterministic form | manual guidance |
+| nth-child / long structural CSS | fragile CSS | manual guidance |
 
 ## Build
 
@@ -35,13 +25,11 @@ TestSentry's Selenium Java scanner.
 
 ## Reset treatment fixtures
 
-After applying TestSentry treatments, restore the intentional-bug baseline:
+After applying TestSentry treatments:
 
 ```bash
 ./reset-treatments.sh
 ```
 
-This copies `__baselines__/IntentionalBugsTest.java` over
-`src/test/java/tests/IntentionalBugsTest.java` and removes the generated Java
-build artifacts (`target/`, `build/`, `.gradle/`, stray `*.class` files) that
-TestSentry validation creates while recompiling the fixture.
+This restores `IntentionalBugsTest.java` from `__baselines__` and removes
+generated Java build artifacts.
